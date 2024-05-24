@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.box {
+  width: 20%;
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 7px;
+  margin: -4px -6px;
+  border: 1.5px solid #c0392b;
+  justify-content: center;
+}
+.lamok-box {
+  margin: 0;
+  padding-bottom: 10px;
+}
+
+.shadow-custom1 {
+  --tw-shadow: 0px 2px 40px 0px rgba(8, 70, 78, 0.08);
+  --tw-shadow-colored: 0px 2px 40px 0px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
+    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.cutive-mono-regular {
+  font-family: "Cutive Mono", monospace;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.cutive-regular {
+  font-family: "Cutive", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.text-secondary {
+  --tw-text-opacity: 1;
+  color: rgb(128 128 128 / var(--tw-text-opacity));
+}
+
+.active {
+  --tw-text-opacity: 1;
+  color: rgb(28 188 207 / var(--tw-text-opacity));
+}
