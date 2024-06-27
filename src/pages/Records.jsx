@@ -3,7 +3,7 @@ import {
   getExistingImages,
   getExistingSensorData,
   createWebSocket,
-} from "../api";
+} from "../Api";
 
 const Records = () => {
   const [images, setImages] = useState([]);
@@ -25,16 +25,19 @@ const Records = () => {
 
     const socket = createWebSocket();
 
-    socket.on("message", (data) => {
-      if (data.type === "image") {
-        setImages((prevImages) => [...prevImages, data.data]);
-      } else if (data.type === "sensor") {
-        setSensorData((prevSensorData) => [...prevSensorData, data.data]);
+    socket.onmessage = (event) => {
+      const parsedData = JSON.parse(event.data);
+      console.log("Received data from WebSocket:", parsedData);
+      if (parsedData.type === "image") {
+        setImages((prevImages) => [...prevImages, parsedData.data]);
+      } else if (parsedData.type === "sensor") {
+        setSensorData((prevSensorData) => [...prevSensorData, parsedData.data]);
       }
-    });
+    };
 
+    // Clean up the WebSocket connection when the component unmounts
     return () => {
-      socket.disconnect();
+      socket.close();
     };
   }, []);
 
@@ -64,6 +67,11 @@ const Records = () => {
                 <p>Processed Filename: {img.processed_filename}</p>
                 <p>Detections: {JSON.stringify(img.detections)}</p>
                 <p>Timestamp: {img.timestamp}</p>
+                <img
+                  src={`data:image/jpeg;base64,${img.processed_image}`}
+                  alt={`Processed ${img.device_id}`}
+                  style={{ width: "300px", height: "auto" }}
+                />
               </li>
             ))}
           </ul>

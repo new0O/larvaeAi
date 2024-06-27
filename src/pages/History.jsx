@@ -1,65 +1,72 @@
 import React, { useState, useEffect } from "react";
+import DataChart from "../components/Datachart";
+
+const devices = ["ESP32_Cam_1", "ESP32_Cam_2", "ESP32_Cam_3"];
 
 const History = () => {
-  const [processedImageData, setProcessedImageData] = useState(null);
-  const [detectionsCount, setDetectionsCount] = useState(0);
-  const [sensorData, setSensorData] = useState(null);
+  const [startDate, setStartDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+  const [endDate, setEndDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
 
+  // useEffect for setting up the interval for automatic refresh
   useEffect(() => {
-    // Fetch data from your FastAPI server
-    fetchProcessedData();
-    fetchSensorData();
+    const interval = setInterval(() => {
+      window.location.reload();
+    }, 30 * 60 * 1000); // 30 minutes
+
+    // Cleanup the interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchProcessedData = async () => {
-    try {
-      const response = await fetch(
-        "http://192.168.100.177:8080/images/ESP32_Cam_1"
-      );
-      const data = await response.json();
-      if (data && data.length > 0) {
-        const latestImage = data[0]; // Assuming data is sorted by timestamp
-        setProcessedImageData(latestImage.processed_image);
-        setDetectionsCount(latestImage.detections_count);
-      }
-    } catch (error) {
-      console.error("Error fetching processed image data:", error);
-    }
-  };
-
-  const fetchSensorData = async () => {
-    try {
-      const response = await fetch(
-        "http://192.168.100.177:8080/sensor-data/ESP32_Cam_1"
-      );
-      const data = await response.json();
-      if (data && data.length > 0) {
-        const latestSensorData = data[0]; // Assuming data is sorted by timestamp
-        setSensorData(latestSensorData);
-      }
-    } catch (error) {
-      console.error("Error fetching sensor data:", error);
-    }
-  };
-
   return (
-    <div>
-      {processedImageData && (
-        <img
-          src={`data:image/jpeg;base64,${processedImageData}`}
-          alt="Processed Image"
-        />
-      )}
-      <p>Detections Count: {detectionsCount}</p>
-      {sensorData && (
-        <div>
-          <p>Device ID: {sensorData.device_id}</p>
-          <p>Water Level: {sensorData.water_level}</p>
-          <p>Humidity: {sensorData.humidity}</p>
-          <p>Temperature: {sensorData.temperature}</p>
-          <p>Water Temperature: {sensorData.waterTemp}</p>
+    <div className="container mx-auto p-4">
+      <div className="date-picker mb-4 p-2 rounded shadow-sm flex items-center space-x-4">
+        <div className="flex items-center space-x-2">
+          <label
+            className="text-gray-700 text-sm font-medium"
+            htmlFor="startDate"
+          >
+            Start Date:
+          </label>
+          <input
+            type="date"
+            id="startDate"
+            className="shadow-sm appearance-none border rounded py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
         </div>
-      )}
+        <div className="flex items-center space-x-2">
+          <label
+            className="text-gray-700 text-sm font-medium"
+            htmlFor="endDate"
+          >
+            End Date:
+          </label>
+          <input
+            type="date"
+            id="endDate"
+            className="shadow-sm appearance-none border rounded py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+        </div>
+      </div>
+      {devices.map((device) => (
+        <div key={device} className="mb-4">
+          <h2 className="text-xl font-bold mb-2">{device}</h2>
+          <div className="bg-white p-4 rounded shadow">
+            <DataChart
+              deviceId={device}
+              startDate={startDate}
+              endDate={endDate}
+            />
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
