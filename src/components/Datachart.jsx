@@ -9,7 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { getAggregatedData } from "../Api";
+import { getAggregatedData } from "../api";
 
 const DataChart = ({ deviceId, startDate, endDate }) => {
   const [data, setData] = useState([]);

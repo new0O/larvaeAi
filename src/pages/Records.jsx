@@ -3,7 +3,7 @@ import {
   getExistingImages,
   getExistingSensorData,
   createWebSocket,
-} from "../Api";
+} from "../api";
 
 const Records = () => {
   const [images, setImages] = useState([]);

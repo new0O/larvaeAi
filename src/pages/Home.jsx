@@ -3,11 +3,12 @@ import {
   getLatestSensorData,
   getExistingImages,
   createWebSocket,
-} from "../Api";
+} from "../api";
 
 export default function Home() {
   const [selectedCamera, setSelectedCamera] = useState("ESP32_Cam_1");
-  const [latestImage, setLatestImage] = useState(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [images, setImages] = useState([]);
   const [latestSensorData, setLatestSensorData] = useState({
     ESP32_Cam_1: null,
     ESP32_Cam_2: null,
@@ -55,27 +56,30 @@ export default function Home() {
     };
   }, []);
 
+  // Fetch the available images when the selected camera changes
   useEffect(() => {
-    const fetchLatestImage = async () => {
+    const fetchImages = async () => {
       try {
-        const images = await getExistingImages(selectedCamera);
-        console.log("Fetched images:", images);
-        if (images.length > 0) {
-          setLatestImage(images[images.length - 1]);
-        } else {
-          setLatestImage(null);
+        const fetchedImages = await getExistingImages(selectedCamera);
+        console.log("Fetched images:", fetchedImages);
+        setImages(fetchedImages);
+        if (fetchedImages.length > 0) {
+          setSelectedImageIndex(0);
         }
       } catch (error) {
         console.error("Error fetching images:", error);
       }
     };
-    fetchLatestImage();
+
+    fetchImages();
   }, [selectedCamera]);
 
+  // Update the displayed image when the selected image changes
   useEffect(() => {
-    if (latestImage) {
+    if (images.length > 0 && selectedImageIndex < images.length) {
+      const selectedImage = images[selectedImageIndex];
       const image = new Image();
-      image.src = `data:image/jpeg;base64,${latestImage.processed_image}`;
+      image.src = `data:image/jpeg;base64,${selectedImage.processed_image}`;
       image.onload = () => {
         const canvas = document.createElement("canvas");
         const context = canvas.getContext("2d");
@@ -87,7 +91,7 @@ export default function Home() {
         context.font = "20px Arial";
         context.fillStyle = "white";
         context.fillText(
-          new Date(latestImage.timestamp).toLocaleString(),
+          new Date(selectedImage.timestamp).toLocaleString(),
           10,
           canvas.height - 20
         );
@@ -95,7 +99,7 @@ export default function Home() {
         setImageWithTimestamp(canvas.toDataURL("image/jpeg"));
       };
     }
-  }, [latestImage]);
+  }, [images, selectedImageIndex]);
 
   const renderData = (latestData) => {
     if (!latestData)
@@ -156,6 +160,19 @@ export default function Home() {
             <option value="ESP32_Cam_2">ESP32 Camera 2</option>
             <option value="ESP32_Cam_3">ESP32 Camera 3</option>
           </select>
+          {images.length > 0 && (
+            <select
+              value={selectedImageIndex}
+              onChange={(e) => setSelectedImageIndex(Number(e.target.value))}
+              className="mb-4 p-2 border font-semibold border-gray-300 rounded"
+            >
+              {images.map((image, index) => (
+                <option key={index} value={index}>
+                  {new Date(image.timestamp).toLocaleString()}
+                </option>
+              ))}
+            </select>
+          )}
           {imageWithTimestamp && (
             <img
               src={imageWithTimestamp}

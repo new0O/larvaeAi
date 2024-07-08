@@ -1,14 +1,16 @@
 import axios from "axios";
 
-const API_URL = "http://192.168.8.101:8080";
+// const API_URL = "http://192.168.8.101:8080";
 // const API_URL = "http://192.168.1.11:8080";
 // const API_URL = "http://192.168.52.204:8080";
+const API_URL = "http://157.173.221.68:8080";
 
 // Function to create a WebSocket connection
 export const createWebSocket = () => {
-  const websocket = new WebSocket("ws://192.168.8.101:8080/ws");
+  // const websocket = new WebSocket("ws://192.168.8.101:8080/ws");
   // const websocket = new WebSocket("ws://192.168.1.11:8080/ws");
   // const websocket = new WebSocket("ws://192.168.52.204:8080/ws");
+  const websocket = new WebSocket("ws://157.173.221.68/ws");
 
   websocket.onopen = (event) => {
     console.log("WebSocket connected");
